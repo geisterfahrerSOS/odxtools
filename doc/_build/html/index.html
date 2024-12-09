@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Welcome to odxtools’s documentation! &#8212; odxtools 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="welcome-to-odxtools-s-documentation">
+<h1>Welcome to odxtools’s documentation!<a class="headerlink" href="#welcome-to-odxtools-s-documentation" title="Permalink to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-odxtools"></span><p>odxtools is a set of utilities to deal with automotive diagnostic
+descriptions of electronic control units using ODX-formatted
+description files.</p>
+<p>ODX stands for “Open Diagnostic Data Exchange” <a class="reference internal" href="#odx">[ODX]</a> and is an XML
+based file format to describe the diagnostic capabilities of the
+various electronic control units (ECUs) of complex distributed
+technical systems (mainly cars and trucks). ODX is an open standard,
+maintained by ASAM e.V. <a class="reference internal" href="#asam">[ASAM]</a> and standardized internationally by
+ISO 22901 <a class="reference internal" href="#iso22901">[ISO22901]</a>.</p>
+<p>The services provided by odxtools encompass parsing and internalizing
+ODX diagnostic database files as well as decoding and endcoding raw
+data of diagnostic requests and responses that are send to/received
+from ECUs in an pythonic manner.</p>
+<section id="examples">
+<h2>Examples:<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Load a database from file <code class="docutils literal notranslate"><span class="pre">my_diag_db.pdx</span></code>:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">odxtools</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">odxtools</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s2">&quot;my_diag_db.pdx&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>List the names of all available services of the first ECU:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># [...]</span>
+
+<span class="n">dl</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">diag_layer_containers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">diag_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available services for </span><span class="si">{</span><span class="n">dl</span><span class="o">.</span><span class="n">short_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">short_name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">dl</span><span class="o">.</span><span class="n">services</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Determine the CAN IDs which the first described ECU uses to send and receive diagnostic messages:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># [...]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECU listens on ID 0x</span><span class="si">{</span><span class="n">dl</span><span class="o">.</span><span class="n">get_receive_id</span><span class="p">()</span><span class="si">:</span><span class="s2">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECU transmits on ID 0x</span><span class="si">{</span><span class="n">dl</span><span class="o">.</span><span class="n">get_send_id</span><span class="p">()</span><span class="si">:</span><span class="s2">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Decode a diagnostic message for an ECU:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># [...]</span>
+
+<span class="n">raw_data</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;°§&quot;</span>
+<span class="n">decoded_message</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;decoded message: </span><span class="si">{</span><span class="n">decoded_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="target" id="asam">[ASAM]</span> ASAM e.V: <a class="reference external" href="https://www.asam.net/">https://www.asam.net/</a></p></li>
+<li><p><span class="target" id="odx">[ODX]</span> The ODX Specification: <a class="reference external" href="https://www.asam.net/standards/detail/mcd-2-d/">https://www.asam.net/standards/detail/mcd-2-d/</a></p></li>
+<li><p><span class="target" id="iso22901">[ISO22901]</span> The ISO 22901 Standard: <a class="reference external" href="https://www.iso.org/standard/41207.html">https://www.iso.org/standard/41207.html</a></p></li>
+</ul>
+</section>
+</section>
+<section id="important-classes">
+<h1>Important classes<a class="headerlink" href="#important-classes" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="odxtools.database.Database">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odxtools.database.</span></span><span class="sig-name descname"><span class="pre">Database</span></span><a class="headerlink" href="#odxtools.database.Database" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class internalizes the diagnostic database for various ECUs
+described by a collection of ODX files which are usually collated
+into a single PDX file.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="odxtools.database.Database.add_auxiliary_file">
+<span class="sig-name descname"><span class="pre">add_auxiliary_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aux_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_file_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">IO</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#odxtools.database.Database.add_auxiliary_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="odxtools.database.Database.add_odx_file">
+<span class="sig-name descname"><span class="pre">add_odx_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">odx_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#odxtools.database.Database.add_odx_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="odxtools.database.Database.add_pdx_file">
+<span class="sig-name descname"><span class="pre">add_pdx_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdx_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">IO</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ZipFile</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#odxtools.database.Database.add_pdx_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add PDX file to database.
+Either pass the path to the file, an IO with the file content or a ZipFile object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.base_variants">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">base_variants</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedItemList</span><span class="p"><span class="pre">[</span></span><span class="pre">BaseVariant</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#odxtools.database.Database.base_variants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base variants defined in the database</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.comparam_specs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comparam_specs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedItemList</span><span class="p"><span class="pre">[</span></span><span class="pre">ComparamSpec</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#odxtools.database.Database.comparam_specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.comparam_subsets">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comparam_subsets</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedItemList</span><span class="p"><span class="pre">[</span></span><span class="pre">ComparamSubset</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#odxtools.database.Database.comparam_subsets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.diag_layer_containers">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">diag_layer_containers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedItemList</span><span class="p"><span class="pre">[</span></span><span class="pre">DiagLayerContainer</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#odxtools.database.Database.diag_layer_containers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.diag_layers">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">diag_layers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedItemList</span><span class="p"><span class="pre">[</span></span><span class="pre">DiagLayer</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#odxtools.database.Database.diag_layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>All diagnostic layers defined in the database</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.ecu_shared_datas">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ecu_shared_datas</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedItemList</span><span class="p"><span class="pre">[</span></span><span class="pre">EcuSharedData</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#odxtools.database.Database.ecu_shared_datas" title="Permalink to this definition">¶</a></dt>
+<dd><p>All ECU shared data layers defined by this database</p>
+<p>ECU shared data layers act as a kind of shared library for
+data that is common to multiple otherwise unrelated ECUs.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.ecu_variants">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ecu_variants</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedItemList</span><span class="p"><span class="pre">[</span></span><span class="pre">EcuVariant</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#odxtools.database.Database.ecu_variants" title="Permalink to this definition">¶</a></dt>
+<dd><p>ECU variants defined in the database</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.ecus">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ecus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedItemList</span><span class="p"><span class="pre">[</span></span><span class="pre">EcuVariant</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#odxtools.database.Database.ecus" title="Permalink to this definition">¶</a></dt>
+<dd><p>ECU variants defined in the database</p>
+<p>This property is an alias for <cite>.ecu_variants</cite></p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.functional_groups">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">functional_groups</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedItemList</span><span class="p"><span class="pre">[</span></span><span class="pre">FunctionalGroup</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#odxtools.database.Database.functional_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Functional group layers defined in the database</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.odxlinks">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">odxlinks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">OdxLinkDatabase</span></em><a class="headerlink" href="#odxtools.database.Database.odxlinks" title="Permalink to this definition">¶</a></dt>
+<dd><p>A map from odx_id to object</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.protocols">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">protocols</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedItemList</span><span class="p"><span class="pre">[</span></span><span class="pre">Protocol</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#odxtools.database.Database.protocols" title="Permalink to this definition">¶</a></dt>
+<dd><p>All protocol layers defined by this database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="odxtools.database.Database.refresh">
+<span class="sig-name descname"><span class="pre">refresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#odxtools.database.Database.refresh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="odxtools.database.Database.short_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">short_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#odxtools.database.Database.short_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">odxtools</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
